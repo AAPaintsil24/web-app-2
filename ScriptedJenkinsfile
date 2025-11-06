@@ -1,0 +1,79 @@
+node {
+    // Define tools
+    def mvnHome = tool name: 'mymaven', type: 'hudson.tasks.Maven$MavenInstallation'
+    def scannerHome = tool name: 'sonarscanner'
+
+    try {
+        stage('git checkout') {
+            git branch: 'main', credentialsId: 'github', url: 'https://github.com/AAPaintsil24/web-app.git'
+        }
+
+        stage('clean and package') {
+            sh "${mvnHome}/bin/mvn clean package"
+        }
+
+        stage('code analysis') {
+            withSonarQubeEnv('sonarserver') {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kofi-webapp"
+            }
+        }
+
+        stage('Quality gate') {
+            timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+            }
+        }
+
+        stage('nexus uploads') {
+            nexusArtifactUploader(
+                artifacts: [[
+                    artifactId: 'maven-web-application',
+                    classifier: '',
+                    file: '/var/lib/jenkins/workspace/albert-pipeline/target/web-app.war',
+                    type: 'war'
+                ]],
+                credentialsId: 'nexus-credentials',
+                groupId: 'com.mt',
+                nexusUrl: '3.147.85.91:8081/repository/albert-webapp/',
+                nexusVersion: 'nexus3',
+                protocol: 'http',
+                repository: 'albert-webapp',
+                version: '3.0.6-RELEASE'
+            )
+        }
+
+
+        stage('deploy to production') {
+            deploy adapters: [
+                tomcat9(
+                    alternativeDeploymentContext: '',
+                    credentialsId: 'tomcat_credentials',
+                    path: '',
+                    url: 'http://18.219.136.173:8080/'
+                )
+            ], contextPath: null, war: 'target/web-app.war'
+        }
+
+        // Send Slack success notification
+        slackSend(
+            color: 'good',
+            message: "success: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${env.BUILD_URL}"
+        )
+
+    } catch (err) {
+        // Send Slack failure notification
+        slackSend(
+            color: 'danger',
+            message: "failed: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${env.BUILD_URL}"
+        )
+        error("Pipeline failed: ${err}")
+    } finally {
+        if (currentBuild.result == 'ABORTED') {
+            // Send Slack aborted notification
+            slackSend(
+                color: 'warning',
+                message: "aborted: ${env.JOB_NAME} #${env.BUILD_NUMBER} - ${env.BUILD_URL}"
+            )
+        }
+    }
+}
