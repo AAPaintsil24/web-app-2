@@ -13,7 +13,7 @@
         chdir: /var/lib/jenkins/workspace/albert-pipeline
 
     - name: Tag image with Docker Hub username
-      command: docker tag web-app-2:latest {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
+      command: docker tag web-app-2:latest albertarko/web-app-2:latest
 
     - name: Log into Docker Hub
       community.docker.docker_login:
