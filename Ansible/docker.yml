@@ -22,7 +22,7 @@
         password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
 
     - name: Push image to Docker Hub
-      command: docker push {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
+      command: docker push albertarko/web-app-2:latest
 
     - name: Run container
-      command: docker run -d --name web-app-2 -p 8081:8000 {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
+      command: docker run -d --name web-app-2 -p 8081:8000 albertarko/web-app-2:latest
