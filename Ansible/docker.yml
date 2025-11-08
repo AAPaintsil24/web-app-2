@@ -1,5 +1,5 @@
 - name: docker build and push
-  hosts: local  # Replace with the hostname or IP address of your target server
+  hosts: local
   become: yes
   
   tasks:
@@ -7,12 +7,13 @@
       apt:
         update_cache: yes
 
-    - name: Build docker image
-      command: docker build -t albertarko/web-app-2:latest .
+    - name: Build docker image locally
+      command: docker build -t web-app-2:latest .
       args:
         chdir: /var/lib/jenkins/workspace/albert-pipeline
 
-  
+    - name: Tag image with Docker Hub username
+      command: docker tag web-app-2:latest {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
 
     - name: Log into Docker Hub
       community.docker.docker_login:
@@ -20,9 +21,8 @@
         username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
         password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
 
-
     - name: Push image to Docker Hub
-      command: docker push albertarko/web-app-2:latest
+      command: docker push {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
 
     - name: Run container
-      command: docker run -d --name web-app-2 -p 8081:8000 albertarko/web-app-2:latest
+      command: docker run -d --name web-app-2 -p 8081:8000 {{ lookup('env', 'DOCKER_USERNAME') }}/web-app-2:latest
