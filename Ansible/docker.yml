@@ -10,7 +10,7 @@
     - name: Build docker image
       command: docker build -t web-app-2 .
       args:
-        chdir: /var/lib/jenkins/web-app-2
+        chdir: /var/lib/jenkins/workspace/albert-pipeline
 
     - name: Tag image
       command: docker tag web-app-2:latest albertarko/web-app-2:latest
