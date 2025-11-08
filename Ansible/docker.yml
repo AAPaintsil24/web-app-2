@@ -22,7 +22,6 @@
       community.docker.docker_image_push:
         name: albertarko/web-app-2
         tag: latest
-        push: yes
 
     - name: Run container
       command: docker run -d --name web-app-2 -p 8081:8000 albertarko/web-app-2:latest
