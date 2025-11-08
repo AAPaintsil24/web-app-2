@@ -1,5 +1,4 @@
-# Use Maven with JDK 17 pre-installed
-FROM maven:3.9.3-openjdk-17
+FROM maven:3.9.0-eclipse-temurin-17
 
 # Set working directory inside the container
 WORKDIR /usr/src/my-web-app-2
