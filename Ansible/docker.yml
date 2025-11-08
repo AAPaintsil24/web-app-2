@@ -19,7 +19,10 @@
         password: "{{ lookup('env', 'DOCKER_PASSWORD') }}"
 
     - name: Push Docker image to Docker Hub
-      command: docker push albertarko/web-app-2:latest
+      community.docker.docker_image_push:
+        name: albertarko/web-app-2
+        tag: latest
+        push: yes
 
     - name: Run container
       command: docker run -d --name web-app-2 -p 8081:8000 albertarko/web-app-2:latest
