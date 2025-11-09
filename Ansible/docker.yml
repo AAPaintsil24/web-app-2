@@ -23,6 +23,8 @@
         name: albertarko/web-apptwo
         tag: latest
         push: true
+        source: local
+
 
 
     - name: Run container
