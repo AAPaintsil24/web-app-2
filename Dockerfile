@@ -1,5 +1,5 @@
 # Use Tomcat base image
-FROM tomcat:10.1
+FROM tomcat:9.0
 
 # Copy the WAR file built by Maven
 COPY target/web-app.war /usr/local/tomcat/webapps/
