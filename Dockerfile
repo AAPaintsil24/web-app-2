@@ -1,13 +1,12 @@
-FROM maven:3.9.0-eclipse-temurin-17
+# Use Tomcat base image
+FROM tomcat:10.1
 
-# Set working directory inside the container
-WORKDIR /usr/src/my-web-app-2
+# Copy the WAR file built by Maven
+COPY target/web-app.war /usr/local/tomcat/webapps/
 
-# Copy the project files into the container
-COPY . .
+# Expose default Tomcat port
+EXPOSE 8080
 
-# Build the project using Maven
-RUN mvn clean package
+# Start Tomcat in foreground
+CMD ["catalina.sh", "run"]
 
-# Run the app using Cargo plugin and Tomcat profile
-CMD ["mvn", "cargo:run", "-P", "tomcat90"]
